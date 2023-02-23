@@ -1,0 +1,71 @@
+//transmitter
+
+#include <SPI.h>
+#include <nRF24L01.h>
+#include <RF24.h>
+
+RF24 radio(7, 8); // CE, CSN
+
+const byte address[6] = "00001";
+
+void setup() {
+  radio.begin();
+  radio.openWritingPipe(address);
+  radio.setPALevel(RF24_PA_MIN);
+  radio.stopListening();
+  pinMode(6,INPUT);
+  Serial.begin(9600);
+  digitalWrite(6, HIGH);
+}
+
+void loop() {
+
+ if (digitalRead(6) == LOW)
+  {
+  const char text[] = "Hello World";
+  radio.write(&text, sizeof(text));
+  Serial.print(digitalRead(6));
+  delay(5);
+
+
+ 
+}
+}
+//receiver
+
+#include <SPI.h>
+#include <nRF24L01.h>
+#include <RF24.h>
+
+RF24 radio(7, 8); // CE, CSN
+
+const byte address[6] = "00001";
+
+void setup() {
+  Serial.begin(9600);
+  radio.begin();
+  radio.openReadingPipe(0, address);
+  radio.setPALevel(RF24_PA_MIN);
+  radio.startListening();
+  pinMode(4, OUTPUT);
+  digitalWrite(4,LOW);
+}
+
+void loop() {
+
+  if (radio.available()) {
+    char text[32] = "";
+    radio.read(&text, sizeof(text));
+    Serial.println(text);
+    Serial.print("\n");
+    digitalWrite(4,HIGH);
+    Serial.print(digitalRead(4));
+    Serial.print("\n");
+    delay(60);}
+  else {
+    digitalWrite(4,LOW);
+    Serial.print(digitalRead(4));
+    Serial.print("\n");
+    delay(60);
+  }
+  }
